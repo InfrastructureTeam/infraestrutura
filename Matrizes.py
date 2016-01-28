@@ -1,12 +1,14 @@
+import argparse
 import math
 import matplotlib.pyplot as plt
 
 class Calculo():
-    def __init__(self, coluna, linha):
-        self.matrizNula = [[0, 0, 0, 0, 0, 0], [2, 27.06, 25.07, 29.44, 23.48, 27.85],
-                           [4, 20.69, 19.10, 35.81, 21.88, 19.50], [6, 17.24, 15.38, 15.12, 16.18, 16.31],
-                           [8, 16.91, 18.18, 17.47, 18.00, 20.09], [16, 6.86, 4.97, 5.47, 4.77, 5.99],
-                           [32, 1.15, 1.42, 0.97, 0.92, 2.05]]
+    def __init__(self, matriz):
+        # self.matrizNula = [[0, 0, 0, 0, 0, 0], [2, 27.06, 25.07, 29.44, 23.48, 27.85],
+        #                    [4, 20.69, 19.10, 35.81, 21.88, 19.50], [6, 17.24, 15.38, 15.12, 16.18, 16.31],
+        #                    [8, 16.91, 18.18, 17.47, 18.00, 20.09], [16, 6.86, 4.97, 5.47, 4.77, 5.99],
+        #                    [32, 1.15, 1.42, 0.97, 0.92, 2.05]]
+        self.matriz
         self.matrizResistividade = []
         self.vetorMedia = []
         self.vetorMediaCorrecao = []
@@ -52,23 +54,31 @@ class Calculo():
                 if j == (self.coluna - 1):
                     self.vetorMediaCorrecao[i-1] = self.vetorMediaCorrecao[i-1]/(self.coluna - 1)
 
-col = int(input("Em quantos locais diferentes as medidas foram realizadas"))
-lin = int(input("Qual a quantidade de distancias diferentes foram utilizadas para os locais"))
+	
+def main():
+	# col = int(input("Em quantos locais diferentes as medidas foram realizadas"))
+	# lin = int(input("Qual a quantidade de distancias diferentes foram utilizadas para os locais"))
+	parser = argparse.ArgumentParser()
+	parser.add_argument('file', help='csv file with data')
+	args = parser.parse_args()
+	print(args.file)
+	# matriz = Calculo(col + 1, lin + 1)
 
-matriz = Calculo(col + 1, lin + 1)
+	# matriz.gera_matriz()
+	# matriz.transforma_resistividade()
+	# matriz.media()
+	# matriz.medidas_corretas()
+	# matriz.media_correcao()
+	# plt.plot([2, 4, 6, 8, 16, 32], matriz.vetorMediaCorrecao)
+	# plt.xlabel('Distancia (m)')
+	# plt.ylabel('Resistividade (ohm*m)')
+	# plt.show()
 
-matriz.gera_matriz()
-matriz.transforma_resistividade()
-matriz.media()
-matriz.medidas_corretas()
-matriz.media_correcao()
-plt.plot([2, 4, 6, 8, 16, 32], matriz.vetorMediaCorrecao)
-plt.xlabel('Distancia (m)')
-plt.ylabel('Resistividade (ohm*m)')
-plt.show()
+	# print(matriz.matrizNula)
+	# print(matriz.matrizCorrigida)
+	# print(matriz.vetorMedia)
+	# print(matriz.matrizResistividade)
+	# print(matriz.vetorMediaCorrecao)
 
-print(matriz.matrizNula)
-print(matriz.matrizCorrigida)
-print(matriz.vetorMedia)
-print(matriz.matrizResistividade)
-print(matriz.vetorMediaCorrecao)
+if __name__ == '__main__':
+	main()

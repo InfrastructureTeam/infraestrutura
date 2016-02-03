@@ -35,11 +35,11 @@ class Calculo():
                 self.matrizResistividade[i][j] = 2*self.matriz[i][j]*math.pi*self.dist[i]
 
     def media(self): #Este metodo calculara a media das medidas para a mesma distancia
-        for i in range(1, self.linha):
-            for j in range(1, self.coluna):
-                self.vetorMedia[i-1] = self.vetorMedia[i-1] + self.matrizResistividade[i][j]
-                if j == (self.coluna - 1):
-                    self.vetorMedia[i-1] = self.vetorMedia[i-1]/(self.coluna - 1)
+        for i in range(self.linha):
+            for j in range(self.coluna):
+                self.vetorMedia[i] += self.matrizResistividade[i][j]
+            self.vetormedia[i] /= self.coluna
+        
 
     def medidas_corretas(self): #Este metodo comparara as resistividades calculadas
         for i in range(1, self.linha):
@@ -63,7 +63,7 @@ def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('file', help='csv file with data')
 	args = parser.parse_args()
-	with open(args.file, 'r') as file:
+	with open('medicoes.csv', 'r') as file:
 		reader = csv.reader(file, delimiter=',')
 		# por simplicidade vou assumir que o numero de colunas -1 e a quantidade de leituras
 		header = next(reader)

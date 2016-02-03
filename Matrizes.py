@@ -1,4 +1,5 @@
 import argparse
+import csv
 import math
 import matplotlib.pyplot as plt
 
@@ -61,7 +62,13 @@ def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('file', help='csv file with data')
 	args = parser.parse_args()
-	print(args.file)
+	with open(args.file, 'r') as file:
+		reader = csv.reader(file, delimiter=',')
+		# por simplicidade vou assumir que o numero de colunas -1 e a quantidade de leituras
+		header = next(reader)
+		data = [[float(item) for item in row] for row in reader] # passa todo mundo para float
+		
+
 	# matriz = Calculo(col + 1, lin + 1)
 
 	# matriz.gera_matriz()

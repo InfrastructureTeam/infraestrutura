@@ -10,12 +10,13 @@ class Calculo():
         #                    [8, 16.91, 18.18, 17.47, 18.00, 20.09], [16, 6.86, 4.97, 5.47, 4.77, 5.99],
         #                    [32, 1.15, 1.42, 0.97, 0.92, 2.05]]
         self.matrizNula = matriz
+        self.dist = dist
         self.matrizResistividade = []
         self.vetorMedia = []
         self.vetorMediaCorrecao = []
         self.matrizCorrigida = []
-        self.coluna = coluna
-        self.linha = linha
+        self.linha = len(self.dist)
+        self.coluna = len(self.matriz[0])
 
     def gera_matriz(self): # Este metodo gera uma matriz nula
         #self.matrizNula = [0] * self.linha
@@ -29,9 +30,9 @@ class Calculo():
             self.matrizCorrigida[i] = [0] * (self.coluna)
 
     def transforma_resistividade(self): #Como o terrometro mostra a resistencia entre os eletrodos este metodo transformara as resistencias em resistividades
-        for i in range(1, self.linha):
-            for j in range(1, self.coluna):
-                self.matrizResistividade[i][j] = 2*self.matrizNula[i][j]*math.pi*self.matrizNula[i][0]
+        for i in range(self.linha):
+            for j in range(self.coluna):
+                self.matrizResistividade[i][j] = 2*self.matriz[i][j]*math.pi*self.dist[i]
 
     def media(self): #Este metodo calculara a media das medidas para a mesma distancia
         for i in range(1, self.linha):

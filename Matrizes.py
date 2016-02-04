@@ -5,60 +5,40 @@ import matplotlib.pyplot as plt
 
 class Calculo():
     def __init__(self, matriz, dist):
-        # self.matrizNula = [[0, 0, 0, 0, 0, 0], [2, 27.06, 25.07, 29.44, 23.48, 27.85],
-        #                    [4, 20.69, 19.10, 35.81, 21.88, 19.50], [6, 17.24, 15.38, 15.12, 16.18, 16.31],
-        #                    [8, 16.91, 18.18, 17.47, 18.00, 20.09], [16, 6.86, 4.97, 5.47, 4.77, 5.99],
-        #                    [32, 1.15, 1.42, 0.97, 0.92, 2.05]]
         self.matrizNula = matriz
         self.dist = dist
-        self.matrizResistividade = []
-        self.vetorMedia = []
-        self.vetorMediaCorrecao = []
-        self.matrizCorrigida = []
-        self.linha = len(self.dist)
-        self.coluna = len(self.matrizNula[0])
-
-    def gera_matriz(self): # Este metodo gera uma matriz nula
-        #self.matrizNula = [0] * self.linha
-        self.matrizResistividade = [0] * (self.linha)
-        self.matrizCorrigida = [0] * (self.linha)
-        self.vetorMedia = [0] * (self.linha)
-        self.vetorMediaCorrecao = [0] * (self.linha)
-        for i in range(self.linha):
-            #self.matrizNula[i] = [0] * (self.coluna + 1)
-            self.matrizResistividade[i] = [0] * (self.coluna)
-            self.matrizCorrigida[i] = [0] * (self.coluna)
-
-    def transforma_resistividade(self): #Como o terrometro mostra a resistencia entre os eletrodos este metodo transformara as resistencias em resistividades
-        for i in range(self.linha):
-            for j in range(self.coluna):
-                self.matrizResistividade[i][j] = 2*self.matrizNula[i][j]*math.pi*self.dist[i]
-
-    def media(self): #Este metodo calculara a media das medidas para a mesma distancia
-        for i in range(self.linha):
-            for j in range(self.coluna):
-                self.vetorMedia[i] += self.matrizResistividade[i][j]
-            self.vetorMedia[i] /= self.coluna
+        self.matrizResistividade = self.transforma_resistividade(self.matrizNula, self.dist)
+        self.vetorMedia = [self.media(array) for array in self.matrizResistividade]
+        self.matrizCorrigida = self.medidas_corretas(self.matrizResistividade, self.vetorMedia)
+        self.vetorMediaCorrecao = [self.media(array) for array in self.matrizCorrigida]
         
 
-    def medidas_corretas(self): #Este metodo comparara as resistividades calculadas
-        for i in range(self.linha):
-            for j in range(self.coluna):
-                if(((self.matrizResistividade[i][j] - self.vetorMedia[i]) / self.vetorMedia[i]) * 100 <= 50):
-                    self.matrizCorrigida[i][j] = self.matrizResistividade[i][j]
-                else:
-                    self.matrizCorrigida[i][j] = 0
+    def transforma_resistividade(self, matriz, dist): #Como o terrometro mostra a resistencia entre os eletrodos este metodo transformara as resistencias em resistividades
+        ''' isso faz a mesma coisa que o return, usei forma inline porque era mais facil separar as linhas 
+        out =[]
+        for i, d in enumerate(dist):
+        	out.append([])
+        	for r in matriz[i]:
+        		out[i].append(2*r*math.pi*d)
+        '''
+        return [[2*r*math.pi*d for r in matriz[i]] for i, d in enumerate(dist)]
 
-    def media_correcao(self):
-        for i in range(self.linha):
-            for j in range(self.coluna):
-                self.vetorMediaCorrecao[i] +=  self.matrizCorrigida[i][j]
-            self.vetorMediaCorrecao[i] /= (self.coluna)
+    def media(self, array): #Este metodo calculara a media de um array
+        return sum(array)/len(array)
+        
+    def medidas_corretas(self, matriz, media): #Este metodo filtra as resistividades que tem um desvio em relaca a media maior que 50%
+        ''' isso faz a mesma coisa que o return, usei forma inline porque era mais facil separar as linhas 
+        out = []
+        for i, m in enumerate(media): # gostaria de nao usar o enumerate mas nao consegui pensar em uma forma melhor
+        	out.append([])
+            for r in matriz[i]:
+                if(((r - m) / m)<=.5):
+                    out[i].append(m)
+        '''
+        return [[r for r in matriz[i] if(((r - m) / m)<=.5) ] for i, m in enumerate(media)]
 
 	
 def main():
-	# col = int(input("Em quantos locais diferentes as medidas foram realizadas"))
-	# lin = int(input("Qual a quantidade de distancias diferentes foram utilizadas para os locais"))
 	parser = argparse.ArgumentParser()
 	parser.add_argument('file', help='csv file with data')
 	args = parser.parse_args()
@@ -70,16 +50,10 @@ def main():
 		dist = [item[0] for item in data] # distancias
 		values = [ item[1:] for item in data] # valores
 		matriz = Calculo(values, dist)
-		matriz.gera_matriz()
-		matriz.transforma_resistividade()
-		matriz.media()
-		matriz.medidas_corretas()
-		matriz.media_correcao()
-		plt.plot([2, 4, 6, 8, 16, 32], matriz.vetorMediaCorrecao)
+		plt.plot(matriz.dist, matriz.vetorMediaCorrecao)
 		plt.xlabel('Distancia (m)')
 		plt.ylabel('Resistividade (ohm*m)')
 		plt.show()
-
 		print(matriz.matrizNula)
 		print(matriz.matrizCorrigida)
 		print(matriz.vetorMedia)

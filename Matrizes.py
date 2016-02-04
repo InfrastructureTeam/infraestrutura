@@ -13,25 +13,25 @@ class Calculo():
         self.dist = dist
         self.linha = len(self.dist)
         self.coluna = len(self.matrizNula[0])
-        self.matrizResistividade = [0] * (self.linha)
+        self.matrizResistividade = self.transforma_resistividade(self.matrizNula, self.dist)
         self.vetorMedia = [0] * (self.linha)
         self.vetorMediaCorrecao = [0] * (self.linha)
         self.matrizCorrigida = [0] * (self.linha)
         for i in range(self.linha):
-            self.matrizResistividade[i] = [0] * (self.coluna)
             self.matrizCorrigida[i] = [0] * (self.coluna)    
+        print(self.matrizResistividade)
         
 
-    def transforma_resistividade(self): #Como o terrometro mostra a resistencia entre os eletrodos este metodo transformara as resistencias em resistividades
-        for i in range(self.linha):
-            for j in range(self.coluna):
-                self.matrizResistividade[i][j] = 2*self.matrizNula[i][j]*math.pi*self.dist[i]
+    def transforma_resistividade(self, matriz, dist): #Como o terrometro mostra a resistencia entre os eletrodos este metodo transformara as resistencias em resistividades
+        return [[2*r*math.pi*d for r in matriz[i]] for i, d in enumerate(dist)]
 
     def media(self): #Este metodo calculara a media das medidas para a mesma distancia
         for i in range(self.linha):
             for j in range(self.coluna):
                 self.vetorMedia[i] += self.matrizResistividade[i][j]
+                print(self.matrizResistividade[i][j])
             self.vetorMedia[i] /= self.coluna
+        print(self.vetorMedia)
         
 
     def medidas_corretas(self): #Este metodo comparara as resistividades calculadas
@@ -63,7 +63,7 @@ def main():
 		dist = [item[0] for item in data] # distancias
 		values = [ item[1:] for item in data] # valores
 		matriz = Calculo(values, dist)
-		matriz.transforma_resistividade()
+		# matriz.transforma_resistividade()
 		matriz.media()
 		matriz.medidas_corretas()
 		matriz.media_correcao()

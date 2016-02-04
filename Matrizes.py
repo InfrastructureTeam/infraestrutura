@@ -11,23 +11,16 @@ class Calculo():
         #                    [32, 1.15, 1.42, 0.97, 0.92, 2.05]]
         self.matrizNula = matriz
         self.dist = dist
-        self.matrizResistividade = []
-        self.vetorMedia = []
-        self.vetorMediaCorrecao = []
-        self.matrizCorrigida = []
         self.linha = len(self.dist)
         self.coluna = len(self.matrizNula[0])
-
-    def gera_matriz(self): # Este metodo gera uma matriz nula
-        #self.matrizNula = [0] * self.linha
         self.matrizResistividade = [0] * (self.linha)
-        self.matrizCorrigida = [0] * (self.linha)
         self.vetorMedia = [0] * (self.linha)
         self.vetorMediaCorrecao = [0] * (self.linha)
+        self.matrizCorrigida = [0] * (self.linha)
         for i in range(self.linha):
-            #self.matrizNula[i] = [0] * (self.coluna + 1)
             self.matrizResistividade[i] = [0] * (self.coluna)
-            self.matrizCorrigida[i] = [0] * (self.coluna)
+            self.matrizCorrigida[i] = [0] * (self.coluna)    
+        
 
     def transforma_resistividade(self): #Como o terrometro mostra a resistencia entre os eletrodos este metodo transformara as resistencias em resistividades
         for i in range(self.linha):
@@ -70,7 +63,6 @@ def main():
 		dist = [item[0] for item in data] # distancias
 		values = [ item[1:] for item in data] # valores
 		matriz = Calculo(values, dist)
-		matriz.gera_matriz()
 		matriz.transforma_resistividade()
 		matriz.media()
 		matriz.medidas_corretas()

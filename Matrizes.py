@@ -15,27 +15,34 @@ class Calculo():
         self.coluna = len(self.matrizNula[0])
         self.matrizResistividade = self.transforma_resistividade(self.matrizNula, self.dist)
         self.vetorMedia = [self.media(array) for array in self.matrizResistividade]
-        self.vetorMediaCorrecao = [0] * (self.linha)
-        self.matrizCorrigida = [0] * (self.linha)
-        for i in range(self.linha):
-            self.matrizCorrigida[i] = [0] * (self.coluna)    
-        print(self.vetorMedia)
+        self.matrizCorrigida = self.medidas_corretas(self.matrizResistividade, self.vetorMedia)
+        self.vetorMediaCorrecao = [self.media(array) for array in self.matrizCorrigida]
+        print(self.matrizCorrigida)
         
 
     def transforma_resistividade(self, matriz, dist): #Como o terrometro mostra a resistencia entre os eletrodos este metodo transformara as resistencias em resistividades
+        ''' isso faz a mesma coisa que o return, usei forma inline porque era mais facil separar as linhas 
+        out =[]
+        for i, d in enumerate(dist):
+        	out.append([])
+        	for r in matriz[i]:
+        		out[i].append(2*r*math.pi*d)
+        '''
         return [[2*r*math.pi*d for r in matriz[i]] for i, d in enumerate(dist)]
 
-    def media(self, array): #Este metodo calculara a media das medidas para a mesma distancia
+    def media(self, array): #Este metodo calculara a media de um array
         return sum(array)/len(array)
         
-
-    def medidas_corretas(self): #Este metodo comparara as resistividades calculadas
-        for i in range(self.linha):
-            for j in range(self.coluna):
-                if(((self.matrizResistividade[i][j] - self.vetorMedia[i]) / self.vetorMedia[i]) * 100 <= 50):
-                    self.matrizCorrigida[i][j] = self.matrizResistividade[i][j]
-                else:
-                    self.matrizCorrigida[i][j] = 0
+    def medidas_corretas(self, matriz, media): #Este metodo filtra as resistividades que tem um desvio em relaca a media maior que 50%
+        ''' isso faz a mesma coisa que o return, usei forma inline porque era mais facil separar as linhas 
+        out = []
+        for i, m in enumerate(media): # gostaria de nao usar o enumerate mas nao consegui pensar em uma forma melhor
+        	out.append([])
+            for r in matriz[i]:
+                if(((r - m) / m)<=.5):
+                    out[i].append(m)
+        '''
+        return [[r for r in matriz[i] if(((r - m) / m)<=.5) ] for i, m in enumerate(media)]
 
     def media_correcao(self):
         for i in range(self.linha):
@@ -60,8 +67,8 @@ def main():
 		matriz = Calculo(values, dist)
 		# matriz.transforma_resistividade()
 		# matriz.media()
-		matriz.medidas_corretas()
-		matriz.media_correcao()
+		# matriz.medidas_corretas()
+		# matriz.media_correcao()
 		plt.plot([2, 4, 6, 8, 16, 32], matriz.vetorMediaCorrecao)
 		plt.xlabel('Distancia (m)')
 		plt.ylabel('Resistividade (ohm*m)')

@@ -62,7 +62,7 @@ def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('file', help='csv file with data')
 	args = parser.parse_args()
-	with open('medicoes.csv', 'r') as file:
+	with open(args.file, 'r') as file:
 		reader = csv.reader(file, delimiter=',')
 		# por simplicidade vou assumir que o numero de colunas -1 e a quantidade de leituras
 		header = next(reader)

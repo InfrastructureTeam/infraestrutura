@@ -50,11 +50,10 @@ class Calculo():
                     self.matrizCorrigida[i][j] = 0
 
     def media_correcao(self):
-        for i in range(1, self.linha):
-            for j in range(1, self.coluna):
-                self.vetorMediaCorrecao[i-1] = self.vetorMediaCorrecao[i-1] + self.matrizCorrigida[i][j]
-                if j == (self.coluna - 1):
-                    self.vetorMediaCorrecao[i-1] = self.vetorMediaCorrecao[i-1]/(self.coluna - 1)
+        for i in range(self.linha):
+            for j in range(self.coluna):
+                self.vetorMediaCorrecao[i] +=  self.matrizCorrigida[i][j]
+            self.vetorMediaCorrecao[i] /= (self.coluna)
 
 	
 def main():
@@ -70,27 +69,22 @@ def main():
 		data = [[float(item) for item in row] for row in reader] # passa todo mundo para float
 		dist = [item[0] for item in data] # distancias
 		values = [ item[1:] for item in data] # valores
-		matriz = Calculo(values, dist)
+		# matriz = Calculo(values, dist)
+		# matriz.gera_matriz()
+		# matriz.transforma_resistividade()
+		# matriz.media()
+		# matriz.medidas_corretas()
+		# matriz.media_correcao()
+		# plt.plot([2, 4, 6, 8, 16, 32], matriz.vetorMediaCorrecao)
+		# plt.xlabel('Distancia (m)')
+		# plt.ylabel('Resistividade (ohm*m)')
+		# plt.show()
 
-		
-
-	# 
-
-	# matriz.gera_matriz()
-	# matriz.transforma_resistividade()
-	# matriz.media()
-	# matriz.medidas_corretas()
-	# matriz.media_correcao()
-	# plt.plot([2, 4, 6, 8, 16, 32], matriz.vetorMediaCorrecao)
-	# plt.xlabel('Distancia (m)')
-	# plt.ylabel('Resistividade (ohm*m)')
-	# plt.show()
-
-	# print(matriz.matrizNula)
-	# print(matriz.matrizCorrigida)
-	# print(matriz.vetorMedia)
-	# print(matriz.matrizResistividade)
-	# print(matriz.vetorMediaCorrecao)
+		# print(matriz.matrizNula)
+		# print(matriz.matrizCorrigida)
+		# print(matriz.vetorMedia)
+		# print(matriz.matrizResistividade)
+		# print(matriz.vetorMediaCorrecao)
 
 if __name__ == '__main__':
 	main()

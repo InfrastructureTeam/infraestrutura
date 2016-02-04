@@ -22,8 +22,8 @@ class Calculo():
         #self.matrizNula = [0] * self.linha
         self.matrizResistividade = [0] * (self.linha)
         self.matrizCorrigida = [0] * (self.linha)
-        self.vetorMedia = [0] * (self.linha - 1)
-        self.vetorMediaCorrecao = [0] * (self.linha - 1)
+        self.vetorMedia = [0] * (self.linha)
+        self.vetorMediaCorrecao = [0] * (self.linha)
         for i in range(self.linha):
             #self.matrizNula[i] = [0] * (self.coluna + 1)
             self.matrizResistividade[i] = [0] * (self.coluna)
@@ -38,13 +38,13 @@ class Calculo():
         for i in range(self.linha):
             for j in range(self.coluna):
                 self.vetorMedia[i] += self.matrizResistividade[i][j]
-            self.vetormedia[i] /= self.coluna
+            self.vetorMedia[i] /= self.coluna
         
 
     def medidas_corretas(self): #Este metodo comparara as resistividades calculadas
-        for i in range(1, self.linha):
-            for j in range(1, self.coluna):
-                if ((self.matrizResistividade[i][j] - self.vetorMedia[i-1]) / self.vetorMedia[i-1]) * 100 <= 50:
+        for i in range(self.linha):
+            for j in range(self.coluna):
+                if(((self.matrizResistividade[i][j] - self.vetorMedia[i]) / self.vetorMedia[i]) * 100 <= 50):
                     self.matrizCorrigida[i][j] = self.matrizResistividade[i][j]
                 else:
                     self.matrizCorrigida[i][j] = 0

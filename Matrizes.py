@@ -16,7 +16,7 @@ class Calculo():
         self.vetorMediaCorrecao = []
         self.matrizCorrigida = []
         self.linha = len(self.dist)
-        self.coluna = len(self.matriz[0])
+        self.coluna = len(self.matrizNula[0])
 
     def gera_matriz(self): # Este metodo gera uma matriz nula
         #self.matrizNula = [0] * self.linha
@@ -32,7 +32,7 @@ class Calculo():
     def transforma_resistividade(self): #Como o terrometro mostra a resistencia entre os eletrodos este metodo transformara as resistencias em resistividades
         for i in range(self.linha):
             for j in range(self.coluna):
-                self.matrizResistividade[i][j] = 2*self.matriz[i][j]*math.pi*self.dist[i]
+                self.matrizResistividade[i][j] = 2*self.matrizNula[i][j]*math.pi*self.dist[i]
 
     def media(self): #Este metodo calculara a media das medidas para a mesma distancia
         for i in range(self.linha):
@@ -69,22 +69,22 @@ def main():
 		data = [[float(item) for item in row] for row in reader] # passa todo mundo para float
 		dist = [item[0] for item in data] # distancias
 		values = [ item[1:] for item in data] # valores
-		# matriz = Calculo(values, dist)
-		# matriz.gera_matriz()
-		# matriz.transforma_resistividade()
-		# matriz.media()
-		# matriz.medidas_corretas()
-		# matriz.media_correcao()
-		# plt.plot([2, 4, 6, 8, 16, 32], matriz.vetorMediaCorrecao)
-		# plt.xlabel('Distancia (m)')
-		# plt.ylabel('Resistividade (ohm*m)')
-		# plt.show()
+		matriz = Calculo(values, dist)
+		matriz.gera_matriz()
+		matriz.transforma_resistividade()
+		matriz.media()
+		matriz.medidas_corretas()
+		matriz.media_correcao()
+		plt.plot([2, 4, 6, 8, 16, 32], matriz.vetorMediaCorrecao)
+		plt.xlabel('Distancia (m)')
+		plt.ylabel('Resistividade (ohm*m)')
+		plt.show()
 
-		# print(matriz.matrizNula)
-		# print(matriz.matrizCorrigida)
-		# print(matriz.vetorMedia)
-		# print(matriz.matrizResistividade)
-		# print(matriz.vetorMediaCorrecao)
+		print(matriz.matrizNula)
+		print(matriz.matrizCorrigida)
+		print(matriz.vetorMedia)
+		print(matriz.matrizResistividade)
+		print(matriz.vetorMediaCorrecao)
 
 if __name__ == '__main__':
 	main()

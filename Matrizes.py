@@ -13,6 +13,29 @@ class Calculo:
         self.vetorMedia = [self.media(array) for array in self.matrizResistividade]
         self.matrizCorrigida = self.medidas_corretas(self.matrizResistividade, self.vetorMedia)
         self.vetorMediaCorrecao = [self.media(array) for array in self.matrizCorrigida]
+        self.kp = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]
+        self.kn = [-0.1, -0.2, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8, -0.9, -0.99]
+        self.ha = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8]
+        self.razaoresistp = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        self.razaoresistn = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
 
     def transforma_resistividade(self, matriz, dist):  # Como o terrometro mostra a resistencia entre os eletrodos este
         # metodo transformara as resistencias em resistividades
@@ -47,23 +70,70 @@ class Calculo:
         ascendencia e descendencia então será realizada a estratificação em várias camadas e este método deverá retornar
         os
         """
-        pass
+        comportamento = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        transposicao = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ascendencia = self.vetorMediaCorrecao[0] - self.vetorMediaCorrecao[1]
+        j = 0
+        duascamadas = 0  # Esta variavel indica o tipo de estratificacao 1 duas camadas e 0 varias camadas
+        if ascendencia < 0:
+            comportamento[j] = 1
+            for i in range(1, len(self.vetorMediaCorrecao) - 1):
+                ascendencia = self.vetorMediaCorrecao[i] - self.vetorMediaCorrecao[i + 1]
+                if ascendencia < 0 and comportamento[j] != 1:
+                    j += 1
+                    comportamento[j] = 1
+                    transposicao[j] = self.vetorMediaCorrecao[i]
+                elif ascendencia > 0 and comportamento[j] == 1:
+                    j += 1
+                    comportamento[j] = 0
+                    transposicao[j] = self.vetorMediaCorrecao[i]
+                elif i == len(self.vetorMediaCorrecao) - 1 and j == 0:
+                    duascamadas = 1
+        return duascamadas, comportamento, j, transposicao
 
     # Estratificação em duas camadas
-    def resistividade_camada_superior(self):
+    def resistividade_camada_superior(self, comparacao):
         """
         Este método prolongará a curva pxa (self.vetorMediaCorrecao x self.dist) obtida pelo método de Wenner até
         o eixo y , e o valor de y será a resistividade da primeira camada,portanto esse valor deverá ser retornado por
         este método.
         """
-        pass
+        self.resistividadePrimeira = int(self.vetorMediaCorrecao[0])
+        if comparacao == 1:
+            while int(self.resistividadePrimeira) % 10 != 0:
+                self.resistividadePrimeira += 1
+            print(self.resistividadePrimeira)
+            self.papn = self.resistividadePrimeira / self.vetorMediaCorrecao[1]
+
+        else:
+            while self.resistividadePrimeira % 10 != 0 and self.resistividadePrimeira > 0:
+                self.resistividadePrimeira -= 1
+            print(self.resistividadePrimeira)
+            self.papn = self.vetorMediaCorrecao[1] / self.resistividadePrimeira
 
     def curvas_teoricas(self):
         """
         Este método fará o cálculo das curvas teóricas p(a)/p1 (ou p1/p(a)) x h/a dependendo do sinal de k que será
         retornado pelo método (tipo_de_curva)
         """
-        pass
+        w = 0
+        l = 0
+
+        for j in range(0, 10):
+            for i in range(0, 10):
+                for n in range(1, 1000):
+                    w += math.pow(self.kp[j], n) * ((1 / math.sqrt(1 + math.pow(2 * n * self.ha[i], 2))) -
+                                                    (1 / math.sqrt(4 + math.pow(2 * n * self.ha[i], 2))))
+                self.razaoresistp[j][i] = 1 / (1 + 4 * w)
+                w = 0
+        for j in range(0, 10):
+            for i in range(10):
+                for n in range(1, 1000):
+                    l += math.pow(self.kn[j], n) * ((1 / math.sqrt(1 + math.pow(2 * n * self.ha[i], 2))) -
+                                                    (1 / math.sqrt(4 + math.pow(2 * n * self.ha[i], 2))))
+                    print(l)
+                self.razaoresistn[j][i] = 1 + 4 * l
+                l = 0
 
     def tabela_k_ha_h(self):
         """
@@ -208,9 +278,16 @@ def main():
         dist = [item[0] for item in data]  # distancias
         values = [item[1:] for item in data]  # valores
         matriz = Calculo(values, dist)
-        plt.plot(matriz.dist, matriz.vetorMediaCorrecao)
-        plt.xlabel('Distancia (m)')
-        plt.ylabel('Resistividade (ohm*m)')
+        duas, alteracao, quantidade, transicao = matriz.tipo_de_curva()
+        matriz.resistividade_camada_superior(alteracao[0])
+        matriz.curvas_teoricas()
+        # plt.plot(matriz.dist, matriz.vetorMediaCorrecao)
+        plt.plot(matriz.ha, matriz.razaoresistp[0], matriz.ha, matriz.razaoresistp[1], matriz.ha,
+        matriz.razaoresistp[2], matriz.ha, matriz.razaoresistp[3], matriz.ha, matriz.razaoresistp[4],
+        matriz.ha, matriz.razaoresistp[5], matriz.ha, matriz.razaoresistp[6], matriz.ha, matriz.razaoresistp[7],
+        matriz.ha, matriz.razaoresistp[8], matriz.ha, matriz.razaoresistp[9])
+        # plt.xlabel('Distancia (m)')
+        # plt.ylabel('Resistividade (ohm*m)')
         plt.show()
         print(matriz.matrizNula)
         print(matriz.matrizCorrigida)

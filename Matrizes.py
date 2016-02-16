@@ -179,12 +179,28 @@ class Calculo:
         """
         pass
 
-    def resistencia_haste(self):
+
+    def hummel(self, profundidade, solo):
+        l=div = profundidade
+        divd = 0
+        for camada in solo:
+            if(l<camada[0]):
+                divd += l/camada[1]
+                break
+            divd+=camada[0]/camada[1]
+            l-=camada[0]
+        roa = div/divd
+        return roa
+
+
+    def resistencia_haste(self, haste, solo):
         """
         Este método calculará a resistência do sistema de aterramento com uma haste vertical do tipo cantoneira ou
         circular
         """
-        pass
+        roa = self.hummel(haste, solo)
+        r = (roa/(2*math.pi*haste[0]))*(math.log((4*haste[0])/haste[1]))
+        return r
 
     def resistencia_hastes_mesma_distancia(self):
         """

@@ -181,16 +181,26 @@ class Calculo:
 
 
     def hummel(self, profundidade, solo):
-        l=div = profundidade
-        divd = 0
+        '''
+        Este metodo calcula a resistividade aparente de uma haste utilizando a formula de Hummel para um solo de varias
+        camadas
+        '''
+        dividendo = profundidade
+        divisor = 0
         for camada in solo:
-            if(l<camada[0]):
-                divd += l/camada[1]
+            if(profundidade<camada[0]):
+                divisor += profundidade/camada[1]
                 break
-            divd+=camada[0]/camada[1]
-            l-=camada[0]
-        roa = div/divd
+            divisor+=camada[0]/camada[1]
+            profundidade-=camada[0]
+        roa = dividendo/divisor
         return roa
+
+    def haste_vertical(self, haste):
+        '''
+        f(g) para uma haste vertical
+        '''
+        return (1/(2*math.pi*haste[0]))*(math.log((4*haste[0])/haste[1]))
 
 
     def resistencia_haste(self, haste, solo):
@@ -198,14 +208,29 @@ class Calculo:
         Este método calculará a resistência do sistema de aterramento com uma haste vertical do tipo cantoneira ou
         circular
         """
-        roa = self.hummel(haste, solo)
-        r = (roa/(2*math.pi*haste[0]))*(math.log((4*haste[0])/haste[1]))
+        roa = self.hummel(haste[0], solo)
+        r = roa * self.haste_vertical(haste)
         return r
 
-    def resistencia_hastes_mesma_distancia(self):
+    def resistencia_hastes_mesma_distancia(self, haste, solo, distancia, num_hastes):
         """
         Este método calculará a resistência do sistema de aterramento com hastes em paralelo igualmente espaçadas
         """
+        roa = self.hummel(haste[0], solo)
+        num_hastes = 4
+        haste=[2.4, 0.0127]
+        distancia = [0, 3, 6, 9] # distancia de cada haste em relacao a primeira haste
+        r = np.array([[0.0]*num_hastes]*num_hastes)
+        for i in range(num_hastes):
+            for j in range(num_hastes):
+                if(i==j):
+                    r[i][i] = self.haste_vertical(haste) # f(g) das hastes sem presenca das outras
+                e = abs(distancia[j] - distancia[i])
+                b = math.sqrt(e**2 + haste[0]**2)
+                p = (((b + haste[0])**2)-e**2)/((e**2)-(b-haste[0])**2)
+                r[i][j] = (1/(4*math.pi*haste[0]))*math.log(p)
+            
+
         pass
 
     def resistencia_hastes_triangulo(self):

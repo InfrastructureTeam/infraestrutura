@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 class Calculo:
-    def __init__(self, matriz, dist):
+    def __init__(self, matriz, dist, haste=None, num_hastes=None):
         self.matrizNula = matriz
         self.dist = dist
         self.matrizResistividade = self.transforma_resistividade(self.matrizNula, self.dist)
@@ -36,6 +36,14 @@ class Calculo:
                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+        # self.num_hastes = 4 # para as resistencias de multiplas hastes em serie
+        # self.haste1=[2.4, 0.0127] # modelo da haste para o calculo da resistencia do aterramento [tamanho, diametro]
+        
+        # self.solo = [[2,500], # esse e o modelo de solo que usei
+        #              [3,200], # cada linha e uma camada do solo com [tamanho, resistividade]
+        #              [99999, 120]] # a ultima camada e infinita entao coloquei um numero grande uma alternativa e utilizar sys.maxsize
+
 
     def transforma_resistividade(self, matriz, dist):  # Como o terrometro mostra a resistencia entre os eletrodos este
         # metodo transformara as resistencias em resistividades
@@ -217,8 +225,6 @@ class Calculo:
         Este método calculará a resistência do sistema de aterramento com hastes em paralelo igualmente espaçadas
         """
         roa = self.hummel(haste[0], solo)
-        num_hastes = 4
-        haste=[2.4, 0.0127]
         d = [distancia*i for i in range(num_hastes)] # distancia de cada haste em relacao a primeira haste
         r = np.array([[0.0]*num_hastes]*num_hastes)
         for i in range(num_hastes):

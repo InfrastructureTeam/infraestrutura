@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 class Calculo:
-    def __init__(self, matriz, dist):
+    def __init__(self, matriz, dist, haste=None, num_hastes=None):
         self.matrizNula = matriz
         self.dist = dist
         self.matrizResistividade = self.transforma_resistividade(self.matrizNula, self.dist)
@@ -36,6 +36,14 @@ class Calculo:
                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+        # self.num_hastes = 4 # para as resistencias de multiplas hastes em serie
+        # self.haste1=[2.4, 0.0127] # modelo da haste para o calculo da resistencia do aterramento [tamanho, diametro]
+        
+        # self.solo = [[2,500], # esse e o modelo de solo que usei
+        #              [3,200], # cada linha e uma camada do solo com [tamanho, resistividade]
+        #              [99999, 120]] # a ultima camada e infinita entao coloquei um numero grande uma alternativa e utilizar sys.maxsize
+
 
     def transforma_resistividade(self, matriz, dist):  # Como o terrometro mostra a resistencia entre os eletrodos este
         # metodo transformara as resistencias em resistividades
@@ -102,13 +110,13 @@ class Calculo:
         if comparacao == 1:
             while int(self.resistividadePrimeira) % 10 != 0:
                 self.resistividadePrimeira += 1
-            print(self.resistividadePrimeira)
+            # print(self.resistividadePrimeira)
             self.papn = self.resistividadePrimeira / self.vetorMediaCorrecao[1]
 
         else:
             while self.resistividadePrimeira % 10 != 0 and self.resistividadePrimeira > 0:
                 self.resistividadePrimeira -= 1
-            print(self.resistividadePrimeira)
+            # print(self.resistividadePrimeira)
             self.papn = self.vetorMediaCorrecao[1] / self.resistividadePrimeira
 
     def curvas_teoricas(self):
@@ -131,7 +139,7 @@ class Calculo:
                 for n in range(1, 1000):
                     l += math.pow(self.kn[j], n) * ((1 / math.sqrt(1 + math.pow(2 * n * self.ha[i], 2))) -
                                                     (1 / math.sqrt(4 + math.pow(2 * n * self.ha[i], 2))))
-                    print(l)
+                    # print(l)
                 self.razaoresistn[j][i] = 1 + 4 * l
                 l = 0
 
@@ -179,18 +187,56 @@ class Calculo:
         """
         pass
 
-    def resistencia_haste(self):
+
+    def hummel(self, profundidade, solo):
+        '''
+        Este metodo calcula a resistividade aparente de uma haste utilizando a formula de Hummel para um solo de varias
+        camadas
+        '''
+        dividendo = profundidade
+        divisor = 0
+        for camada in solo:
+            if(profundidade<camada[0]):
+                divisor += profundidade/camada[1]
+                break
+            divisor+=camada[0]/camada[1]
+            profundidade-=camada[0]
+        roa = dividendo/divisor
+        return roa
+
+    def haste_vertical(self, haste):
+        '''
+        f(g) para uma haste vertical
+        '''
+        return (1/(2*math.pi*haste[0]))*(math.log((4*haste[0])/haste[1]))
+
+
+    def resistencia_haste(self, haste, solo):
         """
         Este método calculará a resistência do sistema de aterramento com uma haste vertical do tipo cantoneira ou
         circular
         """
-        pass
+        roa = self.hummel(haste[0], solo)
+        r = roa * self.haste_vertical(haste)
+        return r
 
-    def resistencia_hastes_mesma_distancia(self):
+    def resistencia_hastes_mesma_distancia(self, haste, solo, distancia, num_hastes):
         """
         Este método calculará a resistência do sistema de aterramento com hastes em paralelo igualmente espaçadas
         """
-        pass
+        roa = self.hummel(haste[0], solo)
+        d = [distancia*i for i in range(num_hastes)] # distancia de cada haste em relacao a primeira haste
+        r = np.array([[0.0]*num_hastes]*num_hastes)
+        for i in range(num_hastes):
+            for j in range(num_hastes):
+                if(i==j):
+                    r[i][i] = self.haste_vertical(haste) # f(g)*roa das hastes sem presenca das outras
+                e = abs(d[j] - d[i])
+                b = math.sqrt(e**2 + haste[0]**2)
+                p = (((b + haste[0])**2)-e**2)/((e**2)-(b-haste[0])**2)
+                r[i][j] = roa*(1/(4*math.pi*haste[0]))*math.log(p)
+        rt = 1/sum([1/sum(e) for e in r])
+        return rt
 
     def resistencia_hastes_triangulo(self):
         """
@@ -286,8 +332,8 @@ def main():
         matriz.razaoresistp[2], matriz.ha, matriz.razaoresistp[3], matriz.ha, matriz.razaoresistp[4],
         matriz.ha, matriz.razaoresistp[5], matriz.ha, matriz.razaoresistp[6], matriz.ha, matriz.razaoresistp[7],
         matriz.ha, matriz.razaoresistp[8], matriz.ha, matriz.razaoresistp[9])
-        # plt.xlabel('Distancia (m)')
-        # plt.ylabel('Resistividade (ohm*m)')
+        plt.xlabel('Distancia (m)')
+        plt.ylabel('Resistividade (ohm*m)')
         plt.show()
         print(matriz.matrizNula)
         print(matriz.matrizCorrigida)

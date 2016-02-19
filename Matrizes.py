@@ -27,13 +27,6 @@ class Calculo:
                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
 
-        # self.num_hastes = 4 # para as resistencias de multiplas hastes em serie
-        # self.haste1=[2.4, 0.0127] # modelo da haste para o calculo da resistencia do aterramento [tamanho, diametro]
-        
-        # self.solo = [[2,500], # esse e o modelo de solo que usei
-        #              [3,200], # cada linha e uma camada do solo com [tamanho, resistividade]
-        #              [99999, 120]] # a ultima camada e infinita entao coloquei um numero grande uma alternativa e utilizar sys.maxsize
-
 
     def transforma_resistividade(self, matriz, dist):  # Como o terrometro mostra a resistencia entre os eletrodos este
         # metodo transformara as resistencias em resistividades
@@ -217,26 +210,8 @@ class Calculo:
         p2 = ((self.resistividadePrimeira*kint) + self.resistividadePrimeira)/(1 - kint)
         return p2, he
 
-    # Estratificação método de Pirson para várias camadas
-    def altura_segunda_camada(self):
-        """
-        Este método calculará a profundidade da segunda camada utilizando a fórmula de Lancaster-Jones,e a retornará
-        """
-        pass
-    def resistividade_terceira(self):
-        """
-        Este método calculará a resistividade da terceira camada
-        """
-        pass
-
     # Dimensionamento de sistemas de aterramento
     # Resistividade aparente
-    def resistividade_aparente(self):
-        """
-        Este método retornará a resistividade aparente do solo
-        """
-        pass
-
 
     def hummel(self, profundidade, solo):
         '''
@@ -287,80 +262,6 @@ class Calculo:
                 r[i][j] = roa*(1/(4*math.pi*haste[0]))*math.log(p)
         rt = 1/sum([1/sum(e) for e in r])
         return rt
-
-    def resistencia_hastes_triangulo(self):
-        """
-        Este método calculará a resistência do sistema de aterramento com hastes em triângulo
-        """
-        pass
-
-    def resistencia_quadrado_vazio(self):
-        """
-        Este método calculará a resistência do sistema de aterramento com hastes em quadrado vazio
-        """
-        pass
-
-    def resistencia_hastes_circunferencia(self):
-        """
-        Este método calculará a resistência do sistema de aterramento com hastes em circunferência
-        """
-        pass
-
-    def resistencia_anel(self):
-        """
-        Este método calculará a resistência do sistema de aterramento de condutores enrrolados em forma de anel
-        enterrados horizontalmente
-        """
-        pass
-
-    def resistencia_condutor_horizontal(self):
-        """
-        Este método calculará a resistência do sistema de aterramento com condutor enterrado horizontalmente no solo
-        """
-        pass
-
-    def resistencia_angulo_reto(self):
-        """
-        Este método calculará a resistência do sistema de aterramento com dois condutores em angulo reto
-        """
-        pass
-
-    def resistencia_estrela_tres(self):
-        """
-        Este método calculará a resistência do sistema de aterramento em estrela com três pontas
-        """
-        pass
-
-    def resistencia_estrela_quatro(self):
-        """
-        Este método calculará a resistência do sistema de aterramento em estrela com quatro pontas
-        """
-        pass
-
-    def resistencia_estrela_seis(self):
-        """
-        Este método calculará a resistência do sistema de aterramento em estrela com seis pontas
-        """
-        pass
-
-    def resistencia_malha(self):
-        """
-        Este método calculará a resistência da Malha de terra
-        """
-        pass
-
-    def potencial_toque(self):
-        """
-        Este método calcula o potencial de toque
-        """
-        pass
-
-    def potencial_passo(self):
-        """
-        Este método calcula o potencial de passo
-        """
-        pass
-
 
 def main():
     parser = argparse.ArgumentParser()

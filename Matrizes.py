@@ -6,6 +6,13 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
+'''Autores:
+            BRUNO VICTOR DE MESQUITA FERREIRA
+            LUCAS RODRIGUES COSTA
+            Edilson Antonio Correa Santiago
+            WILLIAM  MELO FERREIRA
+'''
+
 class Calculo:
     def __init__(self, matriz, dist, haste=None, num_hastes=None):
         self.matrizNula = matriz
@@ -311,7 +318,9 @@ def main():
             plt.ylabel('Resistividade (ohm*m)')
             plt.show()
             rh=matriz.resistencia_haste(haste, solo)
-            print(rh)
+            print('Resistividade para uma haste de',args.c,'metros =',rh)
+            rhm=matriz.resistencia_hastes_mesma_distancia(haste, solo, distancia, num_hastes)
+            print('Resistividade para' ,num_hastes, 'hastes de',args.c,'metros espaçadas a cada',distancia,'metros =',rhm)
 
 
         else:
@@ -320,21 +329,5 @@ def main():
             plt.xlabel('Distancia (m)')
             plt.ylabel('Resistividade (ohm*m)')
             plt.show()
-            rh=matriz.resistencia_haste(haste, solo)
-            print(rh)
-            rhm=matriz.resistencia_hastes_mesma_distancia(haste, solo, distancia, num_hastes)
-            print(rhm)
-        """
-        plt.plot(matriz.ha, matriz.razaoresistp[0], matriz.ha, matriz.razaoresistp[1], matriz.ha,
-        matriz.razaoresistp[2], matriz.ha, matriz.razaoresistp[3], matriz.ha, matriz.razaoresistp[4],
-        matriz.ha, matriz.razaoresistp[5], matriz.ha, matriz.razaoresistp[6], matriz.ha, matriz.razaoresistp[7],
-        matriz.ha, matriz.razaoresistp[8], matriz.ha, matriz.razaoresistp[9])
-        
-        print(matriz.matrizNula)
-        print(matriz.matrizCorrigida)
-        print(matriz.vetorMedia)
-        print(matriz.matrizResistividade)
-        print(matriz.vetorMediaCorrecao)
-        """
 if __name__ == '__main__':
     main()

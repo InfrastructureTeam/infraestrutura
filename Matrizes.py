@@ -1,3 +1,4 @@
+#/usr/bin/python
 # coding=UTF-8
 import argparse
 import csv
@@ -26,7 +27,6 @@ class Calculo:
                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-
 
     def transforma_resistividade(self, matriz, dist):  # Como o terrometro mostra a resistencia entre os eletrodos este
         # metodo transformara as resistencias em resistividades
@@ -268,6 +268,7 @@ def main():
     parser.add_argument('file', help='Arquivo CSV com os dados')
     parser.add_argument('c', help='Comprimento da Haste em metros')
     parser.add_argument('d', help='Diametro da haste em metros')
+    parser.add_argument('n', help='Numero de hastes iguais em mesma distancia')
     args = parser.parse_args()
     with open(args.file, 'r') as file:
         reader = csv.reader(file, delimiter=',')
@@ -276,8 +277,9 @@ def main():
         data = [[float(item) for item in row] for row in reader]  # passa todo mundo para float
         dist = [item[0] for item in data]  # distancias
         values = [item[1:] for item in data]  # valores
-        matriz = Calculo(values, dist)
-
+        haste = [float(args.c), float(args.d)]
+        num_hastes = float(args.n)
+        matriz = Calculo(values, dist, haste=haste, num_hastes=num_hastes)
         alteracao, quantidade, transicao, curvas = matriz.tipo_de_curva()
         print(curvas)
         matriz.resistividade_camada_superior(alteracao[0], matriz.vetorMediaCorrecao[1])
@@ -297,16 +299,17 @@ def main():
             print("Duas camadas")
 
         else:
-            print("Varias camadas")
-        # plt.plot(matriz.dist, matriz.vetorMediaCorrecao)
+            print("O solo possui mais de 2 camadas")
+            plt.plot(matriz.dist, matriz.vetorMediaCorrecao)
+            plt.xlabel('Distancia (m)')
+            plt.ylabel('Resistividade (ohm*m)')
+            plt.show()
         """
         plt.plot(matriz.ha, matriz.razaoresistp[0], matriz.ha, matriz.razaoresistp[1], matriz.ha,
         matriz.razaoresistp[2], matriz.ha, matriz.razaoresistp[3], matriz.ha, matriz.razaoresistp[4],
         matriz.ha, matriz.razaoresistp[5], matriz.ha, matriz.razaoresistp[6], matriz.ha, matriz.razaoresistp[7],
         matriz.ha, matriz.razaoresistp[8], matriz.ha, matriz.razaoresistp[9])
-        # plt.xlabel('Distancia (m)')
-        # plt.ylabel('Resistividade (ohm*m)')
-        plt.show()
+        
         print(matriz.matrizNula)
         print(matriz.matrizCorrigida)
         print(matriz.vetorMedia)

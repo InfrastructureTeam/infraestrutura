@@ -4,7 +4,7 @@ import argparse
 import csv
 import math
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 class Calculo:
     def __init__(self, matriz, dist, haste=None, num_hastes=None):
@@ -119,13 +119,13 @@ class Calculo:
         if comparacao == 1:
             while int(self.resistividadePrimeira) % 10 != 0:
                 self.resistividadePrimeira += 1
-            print(self.resistividadePrimeira)
+            # print(self.resistividadePrimeira)
             papn = self.resistividadePrimeira / resistaleatoria
 
         else:
             while self.resistividadePrimeira % 10 != 0 and self.resistividadePrimeira > 0:
                 self.resistividadePrimeira -= 1
-            print(self.resistividadePrimeira)
+            # print(self.resistividadePrimeira)
             papn = resistaleatoria / self.resistividadePrimeira
 
         return papn
@@ -255,9 +255,13 @@ class Calculo:
         for i in range(num_hastes):
             for j in range(num_hastes):
                 if(i==j):
-                    r[i][i] = self.haste_vertical(haste) # f(g)*roa das hastes sem presenca das outras
+                    r[i][i] = roa*self.haste_vertical(haste) # f(g)*roa das hastes sem presenca das outras
+                    continue
                 e = abs(d[j] - d[i])
                 b = math.sqrt(e**2 + haste[0]**2)
+                # print(e)
+                # print(b)
+                # print(haste)
                 p = (((b + haste[0])**2)-e**2)/((e**2)-(b-haste[0])**2)
                 r[i][j] = roa*(1/(4*math.pi*haste[0]))*math.log(p)
         rt = 1/sum([1/sum(e) for e in r])
@@ -267,8 +271,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('file', help='Arquivo CSV com os dados')
     parser.add_argument('c', help='Comprimento da Haste em metros')
-    parser.add_argument('d', help='Diametro da haste em metros')
+    parser.add_argument('dm', help='Diametro da haste em metros')
     parser.add_argument('n', help='Numero de hastes iguais em mesma distancia')
+    parser.add_argument('dt', help='Distancia entre as hastes')
     args = parser.parse_args()
     with open(args.file, 'r') as file:
         reader = csv.reader(file, delimiter=',')
@@ -277,11 +282,13 @@ def main():
         data = [[float(item) for item in row] for row in reader]  # passa todo mundo para float
         dist = [item[0] for item in data]  # distancias
         values = [item[1:] for item in data]  # valores
-        haste = [float(args.c), float(args.d)]
-        num_hastes = float(args.n)
+        haste = [float(args.c), float(args.dm)]
+        num_hastes = int(args.n)
+        distancia =float(args.dt)
+
         matriz = Calculo(values, dist, haste=haste, num_hastes=num_hastes)
         alteracao, quantidade, transicao, curvas = matriz.tipo_de_curva()
-        print(curvas)
+        # print(curvas)
         matriz.resistividade_camada_superior(alteracao[0], matriz.vetorMediaCorrecao[1])
         matriz.curvas_teoricas(alteracao[0])
         tabela1 = matriz.tabela_k_ha_h(matriz.resistividade_camada_superior(alteracao[0], matriz.vetorMediaCorrecao[1]),
@@ -289,14 +296,23 @@ def main():
         tabela2 = matriz.tabela_k_ha_h(matriz.resistividade_camada_superior(alteracao[0], matriz.vetorMediaCorrecao[2]),
                                        matriz.dist[2])
         # print(estratrazaoresist)
-        matriz.encontro_das_curvas(tabela1, tabela2)
-        print(tabela1)
-        print(tabela2)
+        ro2, t1=matriz.encontro_das_curvas(tabela1, tabela2)
+        # print(tabela1)
+        # print(tabela2)
+        solo=[[t1,matriz.resistividadePrimeira],[9999999,ro2]]
+
         if quantidade == 0:
             matriz.curvas_teoricas(alteracao[0])
-            #  estrat.tabela_k_ha_h(estrat.resistividade_camada_superior(alteracao[0], matriz.vetorMediaCorrecao[1]))
+            # estrat.tabela_k_ha_h(estrat.resistividade_camada_superior(alteracao[0], matriz.vetorMediaCorrecao[1]))
             # estrat.encontro_das_curvas(alteracao[0])
-            print("Duas camadas")
+            print("O solo possui duas camadas")
+            plt.plot(matriz.dist, matriz.vetorMediaCorrecao)
+            plt.xlabel('Distancia (m)')
+            plt.ylabel('Resistividade (ohm*m)')
+            plt.show()
+            rh=matriz.resistencia_haste(haste, solo)
+            print(rh)
+
 
         else:
             print("O solo possui mais de 2 camadas")
@@ -304,6 +320,10 @@ def main():
             plt.xlabel('Distancia (m)')
             plt.ylabel('Resistividade (ohm*m)')
             plt.show()
+            rh=matriz.resistencia_haste(haste, solo)
+            print(rh)
+            rhm=matriz.resistencia_hastes_mesma_distancia(haste, solo, distancia, num_hastes)
+            print(rhm)
         """
         plt.plot(matriz.ha, matriz.razaoresistp[0], matriz.ha, matriz.razaoresistp[1], matriz.ha,
         matriz.razaoresistp[2], matriz.ha, matriz.razaoresistp[3], matriz.ha, matriz.razaoresistp[4],

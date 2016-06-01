@@ -78,10 +78,10 @@ class Calculo:
         if ascendencia < 0:
             comportamento[j] = 1
             for i in range(1, len(self.vetorMediaCorrecao) - 1):
-                curvasporascendencia[j][i] = self.vetorMediaCorrecao[i + 1]
+                curvasporascendencia[j][i + 1] = self.vetorMediaCorrecao[i + 1]
                 ascendencia = self.vetorMediaCorrecao[i] - self.vetorMediaCorrecao[i + 1]
-                if ascendencia < 0 and comportamento[j] != 1:
-                    curvasporascendencia[j] = 0
+                if ascendencia > 0 and comportamento[j] != 1:
+                    # curvasporascendencia[j] = 0
                     j += 1
                     comportamento[j] = 1
                     transposicao[j] = self.vetorMediaCorrecao[i]
@@ -89,23 +89,23 @@ class Calculo:
 
                 elif ascendencia > 0 and comportamento[j] == 1:
                     j += 1
-                    comportamento[j] = 0
+                    # comportamento[j] = 0
                     transposicao[j] = self.vetorMediaCorrecao[i]
                     curvasporascendencia[j][i] = self.vetorMediaCorrecao[i + 1]
 
         elif ascendencia > 0:
             comportamento[j] = 0
             for i in range(1, len(self.vetorMediaCorrecao) - 1):
-                curvasporascendencia[j][i] = self.vetorMediaCorrecao[i + 1]
+                curvasporascendencia[j][i + 1] = self.vetorMediaCorrecao[i + 1]
                 ascendencia = self.vetorMediaCorrecao[i] - self.vetorMediaCorrecao[i + 1]
                 if ascendencia < 0 and comportamento[j] != 0:
                     curvasporascendencia[j] = 0
                     j += 1
-                    comportamento[j] = 1
+                    comportamento[j] = 0
                     transposicao[j] = self.vetorMediaCorrecao[i]
                     curvasporascendencia[j][i] = self.vetorMediaCorrecao[i + 1]
 
-                elif ascendencia > 0 and comportamento[j] == 0:
+                elif ascendencia < 0 and comportamento[j] == 0:
                     j += 1
                     comportamento[j] = 0
                     transposicao[j] = self.vetorMediaCorrecao[i]
@@ -161,7 +161,7 @@ class Calculo:
                     self.razaoresist[j][i] = 1 + 4 * w
                     w = 0
 
-    def tabela_k_ha_h(self, variavelaleatoria, distan):
+    def tabela_k_ha_h(self, variavelaleatoria, distan, kpn):
         """
         Este método retornará uma tabela dos valores de K h/a e h, para isso será necessário escolher um valor qualquer
         de espaçamento na curva (self.vetorMediaCorrecao x self.dist) e pegar o valor de resistividade relacionado
@@ -180,13 +180,43 @@ class Calculo:
                       [0, 0, 0],
                       [0, 0, 0],
                       [0, 0, 0]]
-        for i in range(0, 10):
-            tabelakhah[i][0] = self.kp[i]
-            if self.razaoresist[i][0] < variavelaleatoria:
-                for j in range(0, 9):
-                    if self.razaoresist[i][j] < variavelaleatoria < self.razaoresist[i][j + 1]:
-                        tabelakhah[i][1] = (self.ha[j] + self.ha[j + 1]) / 2
-                        tabelakhah[i][2] = tabelakhah[i][1] * distan
+        if kpn == 1:
+            for i in range(0, 10):
+                tabelakhah[i][0] = self.kp[i]
+                if self.razaoresist[i][0] < variavelaleatoria:
+                    for j in range(0, 9):
+                        if self.razaoresist[i][j] < variavelaleatoria < self.razaoresist[i][j + 1]:
+                            if self.razaoresist[i][j]-variavelaleatoria < 0 and math.fabs(self.razaoresist[i][j] -
+                                                                                            variavelaleatoria) < 0.1:
+
+                                tabelakhah[i][1] = self.ha[j]
+                                tabelakhah[i][2] = tabelakhah[i][1] * distan
+                            elif self.razaoresist[i][j + 1]-variavelaleatoria < 0 and math.fabs(self.razaoresist[i][j +1]
+                                                                                        - variavelaleatoria) < 0.1:
+                                tabelakhah[i][1] = self.ha[j + 1]
+                                tabelakhah[i][2] = tabelakhah[i][1] * distan
+                            else:
+                                tabelakhah[i][1] = (self.ha[j] + self.ha[j + 1]) / 2
+                                tabelakhah[i][2] = tabelakhah[i][1] * distan
+        elif kpn == 0:
+            for i in range(0, 10):
+                tabelakhah[i][0] = self.kn[i]
+                if self.razaoresist[i][0] < variavelaleatoria:
+                    for j in range(0, 9):
+                        if self.razaoresist[i][j] < variavelaleatoria < self.razaoresist[i][j + 1]:
+                            if self.razaoresist[i][j]-variavelaleatoria < 0 and math.fabs(self.razaoresist[i][j] -
+                                                                                            variavelaleatoria) < 0.1:
+
+                                tabelakhah[i][1] = self.ha[j]
+                                tabelakhah[i][2] = tabelakhah[i][1] * distan
+                            elif self.razaoresist[i][j + 1]-variavelaleatoria < 0 and math.fabs(self.razaoresist[i][j +1]
+                                                                                        - variavelaleatoria) < 0.1:
+                                tabelakhah[i][1] = self.ha[j + 1]
+                                tabelakhah[i][2] = tabelakhah[i][1] * distan
+                            else:
+                                tabelakhah[i][1] = (self.ha[j] + self.ha[j + 1]) / 2
+                                tabelakhah[i][2] = tabelakhah[i][1] * distan
+
         return tabelakhah
 
     def encontro_das_curvas(self, tab10, tab20):
@@ -198,6 +228,7 @@ class Calculo:
         tab2 = tab20
         celula = 0
         he = 0
+
         menorvalor = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         menorvalor[0] = (tab1[0][2] - tab2[0][2])
         menorvalor[1] = (tab1[1][2] - tab2[1][2])
@@ -210,11 +241,16 @@ class Calculo:
         menorvalor[8] = (tab1[8][2] - tab2[8][2])
         menorvalor[9] = (tab1[9][2] - tab2[9][2])
         for j in range (0, 8):
-            if menorvalor[j] < menorvalor[j+1]:
-                he = menorvalor[j]
+            if math.fabs(menorvalor[j]) < math.fabs(menorvalor[j+1]):
+                he = (tab1[j ][2] + tab2[j][2])/2
+
                 celula = j
+
         kint = tab1[celula][0]
         p2 = ((self.resistividadePrimeira*kint) + self.resistividadePrimeira)/(1 - kint)
+        print (he)
+        print (p2)
+
         return p2, he
 
     # Dimensionamento de sistemas de aterramento
@@ -298,12 +334,24 @@ def main():
         # print(curvas)
         matriz.resistividade_camada_superior(alteracao[0], matriz.vetorMediaCorrecao[1])
         matriz.curvas_teoricas(alteracao[0])
-        tabela1 = matriz.tabela_k_ha_h(matriz.resistividade_camada_superior(alteracao[0], matriz.vetorMediaCorrecao[1]),
-                                       matriz.dist[1])
-        tabela2 = matriz.tabela_k_ha_h(matriz.resistividade_camada_superior(alteracao[0], matriz.vetorMediaCorrecao[2]),
-                                       matriz.dist[2])
+        tabela1 = matriz.tabela_k_ha_h(matriz.resistividade_camada_superior(alteracao[0], matriz.vetorMediaCorrecao[2]),
+                                       matriz.dist[2], alteracao[0])
+        tabela2 = matriz.tabela_k_ha_h(matriz.resistividade_camada_superior(alteracao[0], matriz.vetorMediaCorrecao[4]),
+                                       matriz.dist[4], alteracao[0])
         # print(estratrazaoresist)
+        '''
+        vetorteste1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        vetorteste2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for i in range(0, 9):
+            vetorteste1[i] = tabela1[i][2]
+            vetorteste2[i] = tabela2[i][2]
+
+        plt.plot(matriz.kn, vetorteste1, matriz.kn, vetorteste2)
+        plt.show()
+        '''
+
         ro2, t1=matriz.encontro_das_curvas(tabela1, tabela2)
+
         # print(tabela1)
         # print(tabela2)
         solo=[[t1,matriz.resistividadePrimeira],[9999999,ro2]]
